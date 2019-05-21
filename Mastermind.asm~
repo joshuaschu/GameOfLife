@@ -4,8 +4,14 @@ LJMP Init
 ORG 100H
 
 Init:
-MOV P2,#0f8h
-MOV P3,#0fdh
+MOV 020H, #0ffh
+MOV 021H, #0f1h
+MOV 022H, #0ffh
+MOV 023H, #0ffh
+MOV 024H, #0ffh
+MOV 025H, #0ffh
+MOV 026H, #0ffh
+MOV 027H, #0ffh
 JMP Start
 
 Start:
@@ -14,10 +20,29 @@ CALL IterZellen
 JMP Start
 
 IterZellen:
+CALL Anzeigen
 CALL LebendeNachbarn
 INC R7 ; zeilenweiser Zähler
 CJNE R7,#040h, IterZellen
 ret
+
+Anzeigen:
+MOV P3, #0feh
+MOV P2, 020H
+MOV P3, #0fdh
+MOV P2, 021H
+MOV P3, #0fbh
+MOV P2, 022H
+MOV P3, #0f7h
+MOV P2, 023H
+MOV P3, #0efh
+MOV P2, 024H
+MOV P3, #0dfh
+MOV P2, 025H
+MOV P3, #0bfh
+MOV P2, 026H
+MOV P3, #07fh
+MOV P2, 027H
 
 WirSindLebendig:
 ret
@@ -59,7 +84,7 @@ MOV a,R1 ; wenn wir hier ankommen ist die aktuelle Zelle tot
 MOV b,#03h
 DIV ab
 CJNE a,#01h,keine7WiederBeleben ; macht das gleiche wie Abbruch
-MOV b,a
+MOV a,b
 CJNE a,#00h,keine7WiederBeleben ; wenn wir hier springen hat die Zelle mehr oder weniger 				als drei lebende Nachbarn
 CJNE R6,#00h,keine0Wiederbeleben
 CPL P3.0
