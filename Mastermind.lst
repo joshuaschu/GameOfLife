@@ -13,259 +13,291 @@ Mastermind                                                                      
 010F 7525FF             12     MOV 025H, #0ffh
 0112 7526FF             13     MOV 026H, #0ffh
 0115 7527FF             14     MOV 027H, #0ffh
-                        15
-0118 02011B             16     JMP Start
-                        17
-                        18     Start:
-011B 7F00               19     MOV R7,#00h
-011D 120122             20     CALL IterZellen
-0120 80F9               21     JMP Start
-                        22
-                        23     IterZellen:
-0122 12012D             24     CALL Anzeigen
-0125 120176             25     CALL LebendeNachbarn
-0128 0F                 26     INC R7 ; zeilenweiser Zähler
-0129 BF40F6             27     CJNE R7,#040h, IterZellen
-012C 22                 28     ret
-                        29
-                        30     Anzeigen:
-012D 75B0FE             31     MOV P3, #0feh
-0130 8520A0             32     MOV P2, 020H
-0133 75A0FF             33     MOV P2, #0ffh
-0136 75B0FD             34     MOV P3, #0fdh
-0139 8521A0             35     MOV P2, 021H
-013C 75A0FF             36     MOV P2, #0ffh
-013F 75B0FB             37     MOV P3, #0fbh
-0142 8522A0             38     MOV P2, 022H
-0145 75A0FF             39     MOV P2, #0ffh
-0148 75B0F7             40     MOV P3, #0f7h
-014B 8523A0             41     MOV P2, 023H
-014E 75A0FF             42     MOV P2, #0ffh
-0151 75B0EF             43     MOV P3, #0efh
-0154 8524A0             44     MOV P2, 024H
-0157 75A0FF             45     MOV P2, #0ffh
-015A 75B0DF             46     MOV P3, #0dfh
-015D 8525A0             47     MOV P2, 025H
-0160 75A0FF             48     MOV P2, #0ffh
-0163 75B0BF             49     MOV P3, #0bfh
-0166 8526A0             50     MOV P2, 026H
-0169 75A0FF             51     MOV P2, #0ffh
-016C 75B07F             52     MOV P3, #07fh
-016F 8527A0             53     MOV P2, 027H
-0172 75A0FF             54     MOV P2, #0ffh
-                        55
-                        56     WirSindLebendig:
-0175 22                 57     ret
-                        58
-                        59     LebendeNachbarn:
-0176 EF                 60     MOV a,R7
-0177 75F008             61     MOV b,#08h
-017A 84                 62     DIV ab
-017B FE                 63     MOV R6,a ; Ergebnis der Division in R6 (y koord)
-017C ADF0               64     MOV R5,b ; Rest der Division in R5 (x koord)
-017E 1E                 65     DEC R6
-017F 1201F6             66     CALL LadeAktuelleZeile
-0182 1D                 67     DEC R5
-0183 120258             68     CALL LebtNoch
-0186 0D                 69     INC R5
-0187 120258             70     CALL LebtNoch
-018A 0D                 71     INC R5
-018B 120258             72     CALL LebtNoch
-018E 0E                 73     INC R6
-018F 1201F6             74     CALL LadeAktuelleZeile
-0192 120258             75     CALL LebtNoch
-0195 0E                 76     INC R6
-0196 1201F6             77     CALL LadeAktuelleZeile
-0199 120258             78     CALL LebtNoch
-019C 1D                 79     DEC R5
-019D 120258             80     CALL LebtNoch
-01A0 1D                 81     DEC R5
-01A1 120258             82     CALL LebtNoch
-01A4 1E                 83     DEC R6
-01A5 1201F6             84     CALL LadeAktuelleZeile
-01A8 120258             85     CALL LebtNoch
-01AB 1201AF             86     CALL RegelnBehandeln
-01AE 22                 87     ret
-                        88
-                        89     RegelnBehandeln:
-01AF EA                 90     MOV a,R2
-01B0 F9                 91     MOV R1,a ; R1 == Anzahl lebender Nachbarn
-01B1 7A00               92     MOV R2,#00h
-01B3 0D                 93     INC R5
-01B4 120258             94     CALL LebtNoch ; wenn R2 == 1 dann lebt aktuelle Zelle, sonst tot
-01B7 BA00BB             95     CJNE R2,#00h, WirSindLebendig
-01BA E9                 96     MOV a,R1 ; wenn wir hier ankommen ist die aktuelle Zelle tot
-01BB 75F003             97     MOV b,#03h
-01BE 84                 98     DIV ab
-01BF B40133             99     CJNE a,#01h,keine7WiederBeleben ; macht das gleiche wie Abbruch
-01C2 E5F0              100     MOV a,b
-01C4 B4002E            101     CJNE a,#00h,keine7WiederBeleben ; wenn wir hier springen hat die Zelle mehr oder weniger
-01C7 1201F6            102     CALL LadeAktuelleZeile
-01CA BE0005            103     CJNE R6,#00h,keine0Wiederbeleben
-01CD B2B0              104     CPL P3.0
-01CF 120227            105     CALL SpeicherAktuelleZeile
-                       106
-                       107     keine0Wiederbeleben:
-01D2 BE0102            108     CJNE R6,#01h, keine1Wiederbeleben
-01D5 B2B1              109     CPL P3.1
-                       110     keine1Wiederbeleben:
-01D7 BE0202            111     CJNE R6,#02h, keine2Wiederbeleben
-01DA B2B2              112     CPL P3.2
-                       113     keine2Wiederbeleben:
-01DC BE0302            114     CJNE R6,#03h, keine3Wiederbeleben
-01DF B2B3              115     CPL P3.3
-                       116     keine3Wiederbeleben:
-01E1 BE0402            117     CJNE R6,#04h, keine4Wiederbeleben
-01E4 B2B4              118     CPL P3.4
-                       119     keine4Wiederbeleben:
-01E6 BE0502            120     CJNE R6,#05h, keine5Wiederbeleben
-01E9 B2B5              121     CPL P3.5
-                       122     keine5Wiederbeleben:
-01EB BE0602            123     CJNE R6,#06h, keine6Wiederbeleben
-01EE B2B6              124     CPL P3.6
-                       125     keine6Wiederbeleben:
-01F0 BE0202            126     CJNE R6,#02h, keine7Wiederbeleben
-01F3 B2B7              127     CPL P3.7
-                       128     keine7Wiederbeleben:
-01F5 22                129     ret
-                       130
-                       131     LadeAktuelleZeile:
-01F6 BD0003            132     CJNE R5, #0h, Keine0AktuelleZeile
-01F9 8520B0            133     MOV P3, 020H
-                       134
-                       135     Keine0AktuelleZeile:
-01FC BD0103            136     CJNE R5, #1h, Keine1AktuelleZeile
-01FF 8521B0            137     MOV P3, 021H
-                       138     Keine1AktuelleZeile:
-0202 BD0203            139     CJNE R5, #2h, Keine2AktuelleZeile
-0205 8522B0            140     MOV P3, 022H
-                       141     Keine2AktuelleZeile:
-0208 BD0303            142     CJNE R5, #3h, Keine3AktuelleZeile
-020B 8523B0            143     MOV P3, 023H
-                       144     Keine3AktuelleZeile:
-020E BD0403            145     CJNE R5, #4h, Keine4AktuelleZeile
-0211 8524B0            146     MOV P3, 024H
-                       147     Keine4AktuelleZeile:
-0214 BD0503            148     CJNE R5, #5h, Keine5AktuelleZeile
-0217 8525B0            149     MOV P3, 025H
-                       150     Keine5AktuelleZeile:
-021A BD0603            151     CJNE R5, #6h, Keine6AktuelleZeile
-021D 8526B0            152     MOV P3, 026H
-                       153     Keine6AktuelleZeile:
-0220 BD0703            154     CJNE R5, #7h, Keine7AktuelleZeile
-0223 8527B0            155     MOV P3, 027H
-                       156     Keine7AktuelleZeile:
-0226 22                157     RET
-                       158
-                       159     SpeicherAktuelleZeile:
-0227 BD0003            160     CJNE R5, #0h, Keine0aktuellezeile2
-022A 85B020            161     MOV 020H, P3
+0118 7528FF             15     MOV 028H, #0ffh
+011B 7529FF             16     MOV 029H, #0ffh
+011E 752AFF             17     MOV 02AH, #0ffh
+0121 752BFF             18     MOV 02BH, #0ffh
+0124 752CFF             19     MOV 02CH, #0ffh
+0127 752DFF             20     MOV 02DH, #0ffh
+012A 752EFF             21     MOV 02EH, #0ffh
+012D 752FFF             22     MOV 02FH, #0ffh
+                        23
+0130 020133             24     JMP Start
+                        25
+                        26     Start:
+0133 7F00               27     MOV R7,#00h
+0135 12013A             28     CALL IterZellen
+0138 80F9               29     JMP Start
+                        30
+                        31     IterZellen:
+013A 120175             32     CALL Anzeigen
+013D 1201BE             33     CALL LebendeNachbarn
+0140 0F                 34     INC R7 ; zeilenweiser Zähler
+0141 BF40F6             35     CJNE R7,#040h, IterZellen
+0144 852820             36     MOV 020H,028H
+0147 852921             37     MOV 021H,029H
+014A 852A22             38     MOV 022H,02AH
+014D 852B23             39     MOV 023H,02BH
+0150 852C24             40     MOV 024H,02CH
+0153 852D25             41     MOV 025H,02DH
+0156 852E26             42     MOV 026H,02EH
+0159 852F27             43     MOV 027H,02FH
+015C 7528FF             44     MOV 028H, #0ffh ; re-init der neuen Generation
+015F 7529FF             45     MOV 029H, #0ffh
+0162 752AFF             46     MOV 02AH, #0ffh
+0165 752BFF             47     MOV 02BH, #0ffh
+0168 752CFF             48     MOV 02CH, #0ffh
+016B 752DFF             49     MOV 02DH, #0ffh
+016E 752EFF             50     MOV 02EH, #0ffh
+0171 752FFF             51     MOV 02FH, #0ffh
+0174 22                 52     ret
+                        53
+                        54     Anzeigen:
+0175 75B0FE             55     MOV P3, #0feh
+0178 8520A0             56     MOV P2, 020H
+017B 75A0FF             57     MOV P2, #0ffh
+017E 75B0FD             58     MOV P3, #0fdh
+0181 8521A0             59     MOV P2, 021H
+0184 75A0FF             60     MOV P2, #0ffh
+0187 75B0FB             61     MOV P3, #0fbh
+018A 8522A0             62     MOV P2, 022H
+018D 75A0FF             63     MOV P2, #0ffh
+0190 75B0F7             64     MOV P3, #0f7h
+0193 8523A0             65     MOV P2, 023H
+0196 75A0FF             66     MOV P2, #0ffh
+0199 75B0EF             67     MOV P3, #0efh
+019C 8524A0             68     MOV P2, 024H
+019F 75A0FF             69     MOV P2, #0ffh
+01A2 75B0DF             70     MOV P3, #0dfh
+01A5 8525A0             71     MOV P2, 025H
+01A8 75A0FF             72     MOV P2, #0ffh
+01AB 75B0BF             73     MOV P3, #0bfh
+01AE 8526A0             74     MOV P2, 026H
+01B1 75A0FF             75     MOV P2, #0ffh
+01B4 75B07F             76     MOV P3, #07fh
+01B7 8527A0             77     MOV P2, 027H
+01BA 75A0FF             78     MOV P2, #0ffh
+                        79
+                        80     WirSindLebendig:
+01BD 22                 81     ret
+                        82
+                        83     LebendeNachbarn:
+01BE 7A00               84     MOV R2,#00h ; init für count auf 0
+01C0 EF                 85     MOV a,R7
+01C1 75F008             86     MOV b,#08h
+01C4 84                 87     DIV ab
+01C5 FE                 88     MOV R6,a ; Ergebnis der Division in R6 (y koord)
+01C6 ADF0               89     MOV R5,b ; Rest der Division in R5 (x koord)
+01C8 1E                 90     DEC R6
+01C9 120255             91     CALL LadeAktuelleZeile
+01CC 1D                 92     DEC R5 ; oben links
+01CD 1202B7             93     CALL LebtNoch
+01D0 0D                 94     INC R5 ; oben mitte
+01D1 1202B7             95     CALL LebtNoch
+01D4 0D                 96     INC R5 ;oben rechts
+01D5 1202B7             97     CALL LebtNoch
+01D8 0E                 98     INC R6 ; rechts daneben
+01D9 120255             99     CALL LadeAktuelleZeile
+01DC 1202B7            100     CALL LebtNoch
+01DF 0E                101     INC R6 ;unten rechts
+01E0 120255            102     CALL LadeAktuelleZeile
+01E3 1202B7            103     CALL LebtNoch
+01E6 1D                104     DEC R5 ; unten mitte
+01E7 1202B7            105     CALL LebtNoch
+01EA 1D                106     DEC R5 ; unten links
+01EB 1202B7            107     CALL LebtNoch
+01EE 1E                108     DEC R6 ; links daneben
+01EF 120255            109     CALL LadeAktuelleZeile
+01F2 1202B7            110     CALL LebtNoch
+01F5 1201F9            111     CALL RegelnBehandeln
+01F8 22                112     ret
+                       113
+                       114     RegelnBehandeln:
+01F9 EA                115     MOV a,R2
+01FA F9                116     MOV R1,a ; R1 == Anzahl lebender Nachbarn
+01FB 7A00              117     MOV R2,#00h
+01FD 0D                118     INC R5
+01FE 1202B7            119     CALL LebtNoch ; wenn R2 == 1 dann lebt aktuelle Zelle, sonst tot
+0201 BA00B9            120     CJNE R2,#00h, WirSindLebendig
+0204 E9                121     MOV a,R1 ; wenn wir hier ankommen ist die aktuelle Zelle tot
+0205 75F003            122     MOV b,#03h
+0208 84                123     DIV ab
+0209 B40148            124     CJNE a,#01h,keine7WiederBeleben ; macht das gleiche wie Abbruch
+020C E5F0              125     MOV a,b
+020E B40043            126     CJNE a,#00h,keine7WiederBeleben ; wenn wir hier springen hat die Zelle mehr oder weniger
+0211 120255            127     CALL LadeAktuelleZeile
+0214 BD0005            128     CJNE R5,#00h,keine0Wiederbeleben
+0217 B2B7              129     CPL P3.7
+0219 120286            130     CALL SpeicherAktuelleZeile
+                       131
+                       132     keine0Wiederbeleben:
+021C BD0105            133     CJNE R5,#01h, keine1Wiederbeleben
+021F B2B6              134     CPL P3.6
+0221 120286            135     CALL SpeicherAktuelleZeile
+                       136     keine1Wiederbeleben:
+0224 BD0205            137     CJNE R5,#02h, keine2Wiederbeleben
+0227 B2B5              138     CPL P3.5
+0229 120286            139     CALL SpeicherAktuelleZeile
+                       140     keine2Wiederbeleben:
+022C BD0305            141     CJNE R5,#03h, keine3Wiederbeleben
+022F B2B4              142     CPL P3.4
+0231 120286            143     CALL SpeicherAktuelleZeile
+                       144     keine3Wiederbeleben:
+0234 BD0405            145     CJNE R5,#04h, keine4Wiederbeleben
+0237 B2B3              146     CPL P3.3
+0239 120286            147     CALL SpeicherAktuelleZeile
+                       148     keine4Wiederbeleben:
+023C BD0505            149     CJNE R5,#05h, keine5Wiederbeleben
+023F B2B2              150     CPL P3.2
+0241 120286            151     CALL SpeicherAktuelleZeile
+                       152     keine5Wiederbeleben:
+0244 BD0605            153     CJNE R5,#06h, keine6Wiederbeleben
+0247 B2B1              154     CPL P3.1
+0249 120286            155     CALL SpeicherAktuelleZeile
+                       156     keine6Wiederbeleben:
+024C BD0205            157     CJNE R5,#02h, keine7Wiederbeleben
+024F B2B0              158     CPL P3.0
+0251 120286            159     CALL SpeicherAktuelleZeile
+                       160     keine7Wiederbeleben:
+0254 22                161     ret
                        162
-                       163     Keine0AktuelleZeile2:
-022D BD0103            164     CJNE R5, #1h, Keine1AktuelleZeile2
-0230 85B021            165     MOV 021H, P3
-                       166     Keine1AktuelleZeile2:
-0233 BD0203            167     CJNE R5, #2h, Keine2AktuelleZeile2
-0236 85B022            168     MOV 022H, P3
-                       169     Keine2AktuelleZeile2:
-0239 BD0303            170     CJNE R5, #3h, Keine3AktuelleZeile2
-023C 85B023            171     MOV 023H, P3
-                       172     Keine3AktuelleZeile2:
-023F BD0403            173     CJNE R5, #4h, Keine4AktuelleZeile2
-0242 85B024            174     MOV 024H, P3
-                       175     Keine4AktuelleZeile2:
-0245 BD0503            176     CJNE R5, #5h, Keine5AktuelleZeile2
-0248 85B025            177     MOV 025H, P3
-                       178     Keine5AktuelleZeile2:
-024B BD0603            179     CJNE R5, #6h, Keine6AktuelleZeile2
-024E 85B026            180     MOV 026H, P3
-                       181     Keine6AktuelleZeile2:
-0251 BD0703            182     CJNE R5, #7h, Keine7AktuelleZeile2
-0254 85B027            183     MOV 027H, P3
-                       184     Keine7AktuelleZeile2:
-0257 22                185     RET
-                       186
-                       187     LebtNoch:
-0258 EE                188     MOV a,R6
-0259 75F0FF            189     MOV b,#0ffh ; durch ff teilen weil R6=FF wenn negativ
-025C 84                190     DIV ab
-025D B40053            191     CJNE a, #00h, Abbruch
-0260 ED                192     MOV a,R5
-0261 75F0FF            193     MOV b,#0ffh ; durch ff teilen weil R5=FF wenn negativ
-0264 84                194     DIV ab
-0265 B4004B            195     CJNE a, #00h , Abbruch
-                       196
-0268 BE0006            197     CJNE R6,#00h, Keine0
-026B A2B0              198     MOV c, P3.0
-026D B3                199     CPL c
-026E 5043              200     JNC Abbruch
-0270 0A                201     INC R2
-                       202
-                       203     Keine0:
-0271 BE0106            204     CJNE R6,#01h, Keine1
-0274 A2B1              205     MOV c, P3.1
-0276 B3                206     CPL c
-0277 503A              207     JNC Abbruch
-0279 0A                208     INC R2
-                       209     Keine1:
-027A BE0206            210     CJNE R6,#02h, Keine2
-027D A2B2              211     MOV c,P3.2
-027F B3                212     CPL c
-0280 5031              213     JNC Abbruch
-0282 0A                214     INC R2
-                       215     Keine2:
-0283 BE0306            216     CJNE R6,#03h, Keine3
-0286 A2B3              217     MOV c,P3.3
-0288 B3                218     CPL c
-0289 5028              219     JNC Abbruch
-028B 0A                220     INC R2
-                       221     Keine3:
-028C BE0406            222     CJNE R6,#04h, Keine4
-028F A2B4              223     MOV c,P3.4
-0291 B3                224     CPL c
-0292 501F              225     JNC Abbruch
-0294 0A                226     INC R2
-                       227     Keine4:
-0295 BE0506            228     CJNE R6,#05h, Keine5
-0298 A2B5              229     MOV c,P3.5
-029A B3                230     CPL c
-029B 5016              231     JNC Abbruch
-029D 0A                232     INC R2
-                       233     Keine5:
-029E BE0606            234     CJNE R6,#06h, Keine6
-02A1 A2B6              235     MOV c,P3.6
-02A3 B3                236     CPL c
-02A4 500D              237     JNC Abbruch
-02A6 0A                238     INC R2
-                       239     Keine6:
-02A7 BE0706            240     CJNE R6,#07h, Keine7
-02AA A2B7              241     MOV c,P3.7
-02AC B3                242     CPL c
-02AD 5004              243     JNC Abbruch
-02AF 0A                244     INC R2
-                       245     Keine7:
-02B0 0202B3            246     JMP Abbruch
-                       247
-                       248     Abbruch:
-02B3 22                249     ret
-                       250
-                       251     Vergleich:
-02B4 BC00FC            252     CJNE R4,#00h, Abbruch
-02B7 BB00F9            253     CJNE R3,#00h, Abbruch
-02BA 0A                254     INC R2
-02BB 22                255     ret
-                       256
+                       163     LadeAktuelleZeile:
+0255 BE0003            164     CJNE R6, #0h, Keine0AktuelleZeile
+0258 8520B0            165     MOV P3, 020H
+                       166
+                       167     Keine0AktuelleZeile:
+025B BE0103            168     CJNE R6, #1h, Keine1AktuelleZeile
+025E 8521B0            169     MOV P3, 021H
+                       170     Keine1AktuelleZeile:
+0261 BE0203            171     CJNE R6, #2h, Keine2AktuelleZeile
+0264 8522B0            172     MOV P3, 022H
+                       173     Keine2AktuelleZeile:
+0267 BE0303            174     CJNE R6, #3h, Keine3AktuelleZeile
+026A 8523B0            175     MOV P3, 023H
+                       176     Keine3AktuelleZeile:
+026D BE0403            177     CJNE R6, #4h, Keine4AktuelleZeile
+0270 8524B0            178     MOV P3, 024H
+                       179     Keine4AktuelleZeile:
+0273 BE0503            180     CJNE R6, #5h, Keine5AktuelleZeile
+0276 8525B0            181     MOV P3, 025H
+                       182     Keine5AktuelleZeile:
+0279 BE0603            183     CJNE R6, #6h, Keine6AktuelleZeile
+027C 8526B0            184     MOV P3, 026H
+                       185     Keine6AktuelleZeile:
+027F BE0703            186     CJNE R6, #7h, Keine7AktuelleZeile
+0282 8527B0            187     MOV P3, 027H
+                       188     Keine7AktuelleZeile:
+0285 22                189     RET
+                       190
+                       191     SpeicherAktuelleZeile:
+0286 BE0003            192     CJNE R6, #0h, Keine0aktuellezeile2
+0289 85B028            193     MOV 028H, P3
+                       194
+                       195     Keine0AktuelleZeile2:
+028C BE0103            196     CJNE R6, #1h, Keine1AktuelleZeile2
+028F 85B029            197     MOV 029H, P3
+                       198     Keine1AktuelleZeile2:
+0292 BE0203            199     CJNE R6, #2h, Keine2AktuelleZeile2
+0295 85B02A            200     MOV 02AH, P3
+                       201     Keine2AktuelleZeile2:
+0298 BE0303            202     CJNE R6, #3h, Keine3AktuelleZeile2
+029B 85B02B            203     MOV 02BH, P3
+                       204     Keine3AktuelleZeile2:
+029E BE0403            205     CJNE R6, #4h, Keine4AktuelleZeile2
+02A1 85B02C            206     MOV 02CH, P3
+                       207     Keine4AktuelleZeile2:
+02A4 BE0503            208     CJNE R6, #5h, Keine5AktuelleZeile2
+02A7 85B02D            209     MOV 02DH, P3
+                       210     Keine5AktuelleZeile2:
+02AA BE0603            211     CJNE R6, #6h, Keine6AktuelleZeile2
+02AD 85B02E            212     MOV 02EH, P3
+                       213     Keine6AktuelleZeile2:
+02B0 BE0703            214     CJNE R6, #7h, Keine7AktuelleZeile2
+02B3 85B02F            215     MOV 02FH, P3
+                       216     Keine7AktuelleZeile2:
+02B6 22                217     RET
+                       218
+                       219     LebtNoch:
+02B7 EE                220     MOV a,R6
+02B8 75F0FF            221     MOV b,#0ffh ; durch ff teilen weil R6=FF wenn negativ
+02BB 84                222     DIV ab
+02BC B40053            223     CJNE a, #00h, Abbruch
+02BF ED                224     MOV a,R5
+02C0 75F0FF            225     MOV b,#0ffh ; durch ff teilen weil R5=FF wenn negativ
+02C3 84                226     DIV ab
+02C4 B4004B            227     CJNE a, #00h , Abbruch
+                       228
+02C7 BE0006            229     CJNE R6,#00h, Keine0
+02CA A2B0              230     MOV c, P3.0
+02CC B3                231     CPL c
+02CD 5043              232     JNC Abbruch
+02CF 0A                233     INC R2
+                       234
+                       235     Keine0:
+02D0 BE0106            236     CJNE R6,#01h, Keine1
+02D3 A2B1              237     MOV c, P3.1
+02D5 B3                238     CPL c
+02D6 503A              239     JNC Abbruch
+02D8 0A                240     INC R2
+                       241     Keine1:
+02D9 BE0206            242     CJNE R6,#02h, Keine2
+02DC A2B2              243     MOV c,P3.2
+02DE B3                244     CPL c
+02DF 5031              245     JNC Abbruch
+02E1 0A                246     INC R2
+                       247     Keine2:
+02E2 BE0306            248     CJNE R6,#03h, Keine3
+02E5 A2B3              249     MOV c,P3.3
+02E7 B3                250     CPL c
+02E8 5028              251     JNC Abbruch
+02EA 0A                252     INC R2
+                       253     Keine3:
+02EB BE0406            254     CJNE R6,#04h, Keine4
+02EE A2B4              255     MOV c,P3.4
+02F0 B3                256     CPL c
+02F1 501F              257     JNC Abbruch
+02F3 0A                258     INC R2
+                       259     Keine4:
+02F4 BE0506            260     CJNE R6,#05h, Keine5
+02F7 A2B5              261     MOV c,P3.5
+02F9 B3                262     CPL c
+02FA 5016              263     JNC Abbruch
+02FC 0A                264     INC R2
+                       265     Keine5:
+02FD BE0606            266     CJNE R6,#06h, Keine6
+0300 A2B6              267     MOV c,P3.6
+0302 B3                268     CPL c
+0303 500D              269     JNC Abbruch
+0305 0A                270     INC R2
+                       271     Keine6:
+0306 BE0706            272     CJNE R6,#07h, Keine7
+0309 A2B7              273     MOV c,P3.7
+030B B3                274     CPL c
+030C 5004              275     JNC Abbruch
+030E 0A                276     INC R2
+                       277     Keine7:
+030F 020312            278     JMP Abbruch
+                       279
+                       280     Abbruch:
+0312 22                281     ret
+                       282
+                       283     Vergleich:
+0313 BC00FC            284     CJNE R4,#00h, Abbruch
+0316 BB00F9            285     CJNE R3,#00h, Abbruch
+0319 0A                286     INC R2
+031A 22                287     ret
+                       288
 ****WARNING:Missing`END'directive
 ASSEMBLY COMPLETE, NO ERRORS FOUND, 1 WARNING
 
 
 ERROR SUMMARY:
-Line 256, WARNING:Missing`END'directive
+Line 288, WARNING:Missing`END'directive
 
 SYMBOL TABLE:
 ??MCU_8051_IDE . . . . . . . . . . .  N  NUMB  8051H  NOT USED
 ??VERSION. . . . . . . . . . . . . .  N  NUMB  0149H  NOT USED
-ABBRUCH. . . . . . . . . . . . . . .  C  ADDR  02B3H
+ABBRUCH. . . . . . . . . . . . . . .  C  ADDR  0312H
 AC . . . . . . . . . . . . . . . . .  B  ADDR  00D6H  NOT USED
 ACC. . . . . . . . . . . . . . . . .  D  ADDR  00E0H  NOT USED
 ACSR . . . . . . . . . . . . . . . .  D  ADDR  0097H  NOT USED
@@ -274,7 +306,7 @@ ADCLK. . . . . . . . . . . . . . . .  D  ADDR  00F2H  NOT USED
 ADCON. . . . . . . . . . . . . . . .  D  ADDR  00F3H  NOT USED
 ADDH . . . . . . . . . . . . . . . .  D  ADDR  00F5H  NOT USED
 ADDL . . . . . . . . . . . . . . . .  D  ADDR  00F4H  NOT USED
-ANZEIGEN . . . . . . . . . . . . . .  C  ADDR  012DH
+ANZEIGEN . . . . . . . . . . . . . .  C  ADDR  0175H
 AUXR . . . . . . . . . . . . . . . .  D  ADDR  008EH  NOT USED
 AUXR1. . . . . . . . . . . . . . . .  D  ADDR  00A2H  NOT USED
 B. . . . . . . . . . . . . . . . . .  D  ADDR  00F0H
@@ -353,45 +385,45 @@ IPL0 . . . . . . . . . . . . . . . .  D  ADDR  00B8H  NOT USED
 IPL1 . . . . . . . . . . . . . . . .  D  ADDR  00B2H  NOT USED
 IT0. . . . . . . . . . . . . . . . .  B  ADDR  0088H  NOT USED
 IT1. . . . . . . . . . . . . . . . .  B  ADDR  008AH  NOT USED
-ITERZELLEN . . . . . . . . . . . . .  C  ADDR  0122H
+ITERZELLEN . . . . . . . . . . . . .  C  ADDR  013AH
 KBE. . . . . . . . . . . . . . . . .  D  ADDR  009DH  NOT USED
 KBF. . . . . . . . . . . . . . . . .  D  ADDR  009EH  NOT USED
 KBLS . . . . . . . . . . . . . . . .  D  ADDR  009CH  NOT USED
-KEINE0 . . . . . . . . . . . . . . .  C  ADDR  0271H
-KEINE0AKTUELLEZEILE. . . . . . . . .  C  ADDR  01FCH
-KEINE0AKTUELLEZEILE2 . . . . . . . .  C  ADDR  022DH
-KEINE0WIEDERBELEBEN. . . . . . . . .  C  ADDR  01D2H
-KEINE1 . . . . . . . . . . . . . . .  C  ADDR  027AH
-KEINE1AKTUELLEZEILE. . . . . . . . .  C  ADDR  0202H
-KEINE1AKTUELLEZEILE2 . . . . . . . .  C  ADDR  0233H
-KEINE1WIEDERBELEBEN. . . . . . . . .  C  ADDR  01D7H
-KEINE2 . . . . . . . . . . . . . . .  C  ADDR  0283H
-KEINE2AKTUELLEZEILE. . . . . . . . .  C  ADDR  0208H
-KEINE2AKTUELLEZEILE2 . . . . . . . .  C  ADDR  0239H
-KEINE2WIEDERBELEBEN. . . . . . . . .  C  ADDR  01DCH
-KEINE3 . . . . . . . . . . . . . . .  C  ADDR  028CH
-KEINE3AKTUELLEZEILE. . . . . . . . .  C  ADDR  020EH
-KEINE3AKTUELLEZEILE2 . . . . . . . .  C  ADDR  023FH
-KEINE3WIEDERBELEBEN. . . . . . . . .  C  ADDR  01E1H
-KEINE4 . . . . . . . . . . . . . . .  C  ADDR  0295H
-KEINE4AKTUELLEZEILE. . . . . . . . .  C  ADDR  0214H
-KEINE4AKTUELLEZEILE2 . . . . . . . .  C  ADDR  0245H
-KEINE4WIEDERBELEBEN. . . . . . . . .  C  ADDR  01E6H
-KEINE5 . . . . . . . . . . . . . . .  C  ADDR  029EH
-KEINE5AKTUELLEZEILE. . . . . . . . .  C  ADDR  021AH
-KEINE5AKTUELLEZEILE2 . . . . . . . .  C  ADDR  024BH
-KEINE5WIEDERBELEBEN. . . . . . . . .  C  ADDR  01EBH
-KEINE6 . . . . . . . . . . . . . . .  C  ADDR  02A7H
-KEINE6AKTUELLEZEILE. . . . . . . . .  C  ADDR  0220H
-KEINE6AKTUELLEZEILE2 . . . . . . . .  C  ADDR  0251H
-KEINE6WIEDERBELEBEN. . . . . . . . .  C  ADDR  01F0H
-KEINE7 . . . . . . . . . . . . . . .  C  ADDR  02B0H
-KEINE7AKTUELLEZEILE. . . . . . . . .  C  ADDR  0226H
-KEINE7AKTUELLEZEILE2 . . . . . . . .  C  ADDR  0257H
-KEINE7WIEDERBELEBEN. . . . . . . . .  C  ADDR  01F5H
-LADEAKTUELLEZEILE. . . . . . . . . .  C  ADDR  01F6H
-LEBENDENACHBARN. . . . . . . . . . .  C  ADDR  0176H
-LEBTNOCH . . . . . . . . . . . . . .  C  ADDR  0258H
+KEINE0 . . . . . . . . . . . . . . .  C  ADDR  02D0H
+KEINE0AKTUELLEZEILE. . . . . . . . .  C  ADDR  025BH
+KEINE0AKTUELLEZEILE2 . . . . . . . .  C  ADDR  028CH
+KEINE0WIEDERBELEBEN. . . . . . . . .  C  ADDR  021CH
+KEINE1 . . . . . . . . . . . . . . .  C  ADDR  02D9H
+KEINE1AKTUELLEZEILE. . . . . . . . .  C  ADDR  0261H
+KEINE1AKTUELLEZEILE2 . . . . . . . .  C  ADDR  0292H
+KEINE1WIEDERBELEBEN. . . . . . . . .  C  ADDR  0224H
+KEINE2 . . . . . . . . . . . . . . .  C  ADDR  02E2H
+KEINE2AKTUELLEZEILE. . . . . . . . .  C  ADDR  0267H
+KEINE2AKTUELLEZEILE2 . . . . . . . .  C  ADDR  0298H
+KEINE2WIEDERBELEBEN. . . . . . . . .  C  ADDR  022CH
+KEINE3 . . . . . . . . . . . . . . .  C  ADDR  02EBH
+KEINE3AKTUELLEZEILE. . . . . . . . .  C  ADDR  026DH
+KEINE3AKTUELLEZEILE2 . . . . . . . .  C  ADDR  029EH
+KEINE3WIEDERBELEBEN. . . . . . . . .  C  ADDR  0234H
+KEINE4 . . . . . . . . . . . . . . .  C  ADDR  02F4H
+KEINE4AKTUELLEZEILE. . . . . . . . .  C  ADDR  0273H
+KEINE4AKTUELLEZEILE2 . . . . . . . .  C  ADDR  02A4H
+KEINE4WIEDERBELEBEN. . . . . . . . .  C  ADDR  023CH
+KEINE5 . . . . . . . . . . . . . . .  C  ADDR  02FDH
+KEINE5AKTUELLEZEILE. . . . . . . . .  C  ADDR  0279H
+KEINE5AKTUELLEZEILE2 . . . . . . . .  C  ADDR  02AAH
+KEINE5WIEDERBELEBEN. . . . . . . . .  C  ADDR  0244H
+KEINE6 . . . . . . . . . . . . . . .  C  ADDR  0306H
+KEINE6AKTUELLEZEILE. . . . . . . . .  C  ADDR  027FH
+KEINE6AKTUELLEZEILE2 . . . . . . . .  C  ADDR  02B0H
+KEINE6WIEDERBELEBEN. . . . . . . . .  C  ADDR  024CH
+KEINE7 . . . . . . . . . . . . . . .  C  ADDR  030FH
+KEINE7AKTUELLEZEILE. . . . . . . . .  C  ADDR  0285H
+KEINE7AKTUELLEZEILE2 . . . . . . . .  C  ADDR  02B6H
+KEINE7WIEDERBELEBEN. . . . . . . . .  C  ADDR  0254H
+LADEAKTUELLEZEILE. . . . . . . . . .  C  ADDR  0255H
+LEBENDENACHBARN. . . . . . . . . . .  C  ADDR  01BEH
+LEBTNOCH . . . . . . . . . . . . . .  C  ADDR  02B7H
 OSCCON . . . . . . . . . . . . . . .  D  ADDR  0086H  NOT USED
 OV . . . . . . . . . . . . . . . . .  B  ADDR  00D2H  NOT USED
 P. . . . . . . . . . . . . . . . . .  B  ADDR  00D0H  NOT USED
@@ -428,7 +460,7 @@ RCAP2H . . . . . . . . . . . . . . .  D  ADDR  00CBH  NOT USED
 RCAP2L . . . . . . . . . . . . . . .  D  ADDR  00CAH  NOT USED
 RCLK . . . . . . . . . . . . . . . .  B  ADDR  00CDH  NOT USED
 RD . . . . . . . . . . . . . . . . .  B  ADDR  00B7H  NOT USED
-REGELNBEHANDELN. . . . . . . . . . .  C  ADDR  01AFH
+REGELNBEHANDELN. . . . . . . . . . .  C  ADDR  01F9H
 REN. . . . . . . . . . . . . . . . .  B  ADDR  009CH  NOT USED
 RESET. . . . . . . . . . . . . . . .  C  ADDR  0000H  NOT USED
 RI . . . . . . . . . . . . . . . . .  B  ADDR  0098H  NOT USED
@@ -452,10 +484,10 @@ SPCON. . . . . . . . . . . . . . . .  D  ADDR  00C3H  NOT USED
 SPCR . . . . . . . . . . . . . . . .  D  ADDR  00D5H  NOT USED
 SPDAT. . . . . . . . . . . . . . . .  D  ADDR  00C5H  NOT USED
 SPDR . . . . . . . . . . . . . . . .  D  ADDR  0086H  NOT USED
-SPEICHERAKTUELLEZEILE. . . . . . . .  C  ADDR  0227H
+SPEICHERAKTUELLEZEILE. . . . . . . .  C  ADDR  0286H
 SPSR . . . . . . . . . . . . . . . .  D  ADDR  00AAH  NOT USED
 SPSTA. . . . . . . . . . . . . . . .  D  ADDR  00C4H  NOT USED
-START. . . . . . . . . . . . . . . .  C  ADDR  011BH
+START. . . . . . . . . . . . . . . .  C  ADDR  0133H
 T0 . . . . . . . . . . . . . . . . .  B  ADDR  00B4H  NOT USED
 T1 . . . . . . . . . . . . . . . . .  B  ADDR  00B5H  NOT USED
 T2CON. . . . . . . . . . . . . . . .  D  ADDR  00C8H  NOT USED
@@ -481,9 +513,9 @@ TR0. . . . . . . . . . . . . . . . .  B  ADDR  008CH  NOT USED
 TR1. . . . . . . . . . . . . . . . .  B  ADDR  008EH  NOT USED
 TR2. . . . . . . . . . . . . . . . .  B  ADDR  00CAH  NOT USED
 TXD. . . . . . . . . . . . . . . . .  B  ADDR  00B1H  NOT USED
-VERGLEICH. . . . . . . . . . . . . .  C  ADDR  02B4H  NOT USED
+VERGLEICH. . . . . . . . . . . . . .  C  ADDR  0313H  NOT USED
 WDTCON . . . . . . . . . . . . . . .  D  ADDR  00A7H  NOT USED
 WDTPRG . . . . . . . . . . . . . . .  D  ADDR  00A7H  NOT USED
 WDTRST . . . . . . . . . . . . . . .  D  ADDR  00A6H  NOT USED
-WIRSINDLEBENDIG. . . . . . . . . . .  C  ADDR  0175H
+WIRSINDLEBENDIG. . . . . . . . . . .  C  ADDR  01BDH
 WR . . . . . . . . . . . . . . . . .  B  ADDR  00B6H  NOT USED

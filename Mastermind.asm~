@@ -24,6 +24,7 @@ IterZellen:
 CALL Anzeigen
 CALL LebendeNachbarn
 INC R7 ; zeilenweiser Zähler
+MOV 028H,020H
 CJNE R7,#040h, IterZellen
 ret
 
@@ -57,6 +58,7 @@ WirSindLebendig:
 ret
 
 LebendeNachbarn:
+MOV R2,#00h ; init für count auf 0
 MOV a,R7
 MOV b,#08h
 DIV ab
@@ -64,23 +66,23 @@ MOV R6,a ; Ergebnis der Division in R6 (y koord)
 MOV R5,b ; Rest der Division in R5 (x koord)
 DEC R6
 CALL LadeAktuelleZeile
-DEC R5
+DEC R5 ; oben links
 CALL LebtNoch
-INC R5
+INC R5 ; oben mitte
 CALL LebtNoch
-INC R5
+INC R5 ;oben rechts
 CALL LebtNoch
-INC R6
+INC R6 ; rechts daneben
 CALL LadeAktuelleZeile
 CALL LebtNoch
-INC R6
+INC R6 ;unten rechts
 CALL LadeAktuelleZeile
 CALL LebtNoch
-DEC R5
+DEC R5 ; unten mitte
 CALL LebtNoch
-DEC R5
+DEC R5 ; unten links
 CALL LebtNoch
-DEC R6
+DEC R6 ; links daneben
 CALL LadeAktuelleZeile
 CALL LebtNoch
 CALL RegelnBehandeln
@@ -100,87 +102,94 @@ CJNE a,#01h,keine7WiederBeleben ; macht das gleiche wie Abbruch
 MOV a,b
 CJNE a,#00h,keine7WiederBeleben ; wenn wir hier springen hat die Zelle mehr oder weniger 				als drei lebende Nachbarn
 CALL LadeAktuelleZeile
-CJNE R6,#00h,keine0Wiederbeleben
-CPL P3.0
+CJNE R5,#00h,keine0Wiederbeleben
+CPL P3.7
 CALL SpeicherAktuelleZeile
 
 keine0Wiederbeleben:
-CJNE R6,#01h, keine1Wiederbeleben
-CPL P3.1
-keine1Wiederbeleben:
-CJNE R6,#02h, keine2Wiederbeleben
-CPL P3.2
-keine2Wiederbeleben:
-CJNE R6,#03h, keine3Wiederbeleben
-CPL P3.3
-keine3Wiederbeleben:
-CJNE R6,#04h, keine4Wiederbeleben
-CPL P3.4
-keine4Wiederbeleben:
-CJNE R6,#05h, keine5Wiederbeleben
-CPL P3.5
-keine5Wiederbeleben:
-CJNE R6,#06h, keine6Wiederbeleben
+CJNE R5,#01h, keine1Wiederbeleben
 CPL P3.6
+CALL SpeicherAktuelleZeile
+keine1Wiederbeleben:
+CJNE R5,#02h, keine2Wiederbeleben
+CPL P3.5
+CALL SpeicherAktuelleZeile
+keine2Wiederbeleben:
+CJNE R5,#03h, keine3Wiederbeleben
+CPL P3.4
+CALL SpeicherAktuelleZeile
+keine3Wiederbeleben:
+CJNE R5,#04h, keine4Wiederbeleben
+CPL P3.3
+CALL SpeicherAktuelleZeile
+keine4Wiederbeleben:
+CJNE R5,#05h, keine5Wiederbeleben
+CPL P3.2
+CALL SpeicherAktuelleZeile
+keine5Wiederbeleben:
+CJNE R5,#06h, keine6Wiederbeleben
+CPL P3.1
+CALL SpeicherAktuelleZeile
 keine6Wiederbeleben:
-CJNE R6,#02h, keine7Wiederbeleben
-CPL P3.7
+CJNE R5,#02h, keine7Wiederbeleben
+CPL P3.0
+CALL SpeicherAktuelleZeile
 keine7Wiederbeleben:
 ret
 
 LadeAktuelleZeile:
-CJNE R5, #0h, Keine0AktuelleZeile
+CJNE R6, #0h, Keine0AktuelleZeile
 MOV P3, 020H
 
 Keine0AktuelleZeile:
-CJNE R5, #1h, Keine1AktuelleZeile
+CJNE R6, #1h, Keine1AktuelleZeile
 MOV P3, 021H
 Keine1AktuelleZeile:
-CJNE R5, #2h, Keine2AktuelleZeile
+CJNE R6, #2h, Keine2AktuelleZeile
 MOV P3, 022H
 Keine2AktuelleZeile:
-CJNE R5, #3h, Keine3AktuelleZeile
+CJNE R6, #3h, Keine3AktuelleZeile
 MOV P3, 023H
 Keine3AktuelleZeile:
-CJNE R5, #4h, Keine4AktuelleZeile
+CJNE R6, #4h, Keine4AktuelleZeile
 MOV P3, 024H
 Keine4AktuelleZeile:
-CJNE R5, #5h, Keine5AktuelleZeile
+CJNE R6, #5h, Keine5AktuelleZeile
 MOV P3, 025H
 Keine5AktuelleZeile:
-CJNE R5, #6h, Keine6AktuelleZeile
+CJNE R6, #6h, Keine6AktuelleZeile
 MOV P3, 026H
 Keine6AktuelleZeile:
-CJNE R5, #7h, Keine7AktuelleZeile
+CJNE R6, #7h, Keine7AktuelleZeile
 MOV P3, 027H
 Keine7AktuelleZeile:
 RET
 
 SpeicherAktuelleZeile:
-CJNE R5, #0h, Keine0aktuellezeile2
-MOV 020H, P3
+CJNE R6, #0h, Keine0aktuellezeile2
+MOV 028H, P3
 
 Keine0AktuelleZeile2:
-CJNE R5, #1h, Keine1AktuelleZeile2
-MOV 021H, P3
+CJNE R6, #1h, Keine1AktuelleZeile2
+MOV 029H, P3
 Keine1AktuelleZeile2:
-CJNE R5, #2h, Keine2AktuelleZeile2
-MOV 022H, P3
+CJNE R6, #2h, Keine2AktuelleZeile2
+MOV 02AH, P3
 Keine2AktuelleZeile2:
-CJNE R5, #3h, Keine3AktuelleZeile2
-MOV 023H, P3
+CJNE R6, #3h, Keine3AktuelleZeile2
+MOV 02BH, P3
 Keine3AktuelleZeile2:
-CJNE R5, #4h, Keine4AktuelleZeile2
-MOV 024H, P3
+CJNE R6, #4h, Keine4AktuelleZeile2
+MOV 02CH, P3
 Keine4AktuelleZeile2:
-CJNE R5, #5h, Keine5AktuelleZeile2
-MOV 025H, P3
+CJNE R6, #5h, Keine5AktuelleZeile2
+MOV 02DH, P3
 Keine5AktuelleZeile2:
-CJNE R5, #6h, Keine6AktuelleZeile2
-MOV 026H, P3
+CJNE R6, #6h, Keine6AktuelleZeile2
+MOV 02EH, P3
 Keine6AktuelleZeile2:
-CJNE R5, #7h, Keine7AktuelleZeile2
-MOV 027H, P3
+CJNE R6, #7h, Keine7AktuelleZeile2
+MOV 02FH, P3
 Keine7AktuelleZeile2:
 RET
 
