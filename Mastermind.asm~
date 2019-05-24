@@ -13,6 +13,15 @@ MOV 025H, #0ffh
 MOV 026H, #0ffh
 MOV 027H, #0ffh
 
+MOV 028H, #0ffh
+MOV 029H, #0f8h
+MOV 02AH, #0ffh
+MOV 02BH, #0ffh
+MOV 02CH, #0ffh
+MOV 02DH, #0ffh
+MOV 02EH, #0ffh
+MOV 02FH, #0ffh
+
 JMP Start
 
 Start:
@@ -24,8 +33,23 @@ IterZellen:
 CALL Anzeigen
 CALL LebendeNachbarn
 INC R7 ; zeilenweiser Zähler
-MOV 028H,020H
 CJNE R7,#040h, IterZellen
+MOV 020H,028H
+MOV 021H,029H
+MOV 022H,02AH
+MOV 023H,02BH
+MOV 024H,02CH
+MOV 025H,02DH
+MOV 026H,02EH
+MOV 027H,02FH
+MOV 028H, #0ffh ; re-init der neuen Generation
+MOV 029H, #0ffh
+MOV 02AH, #0ffh
+MOV 02BH, #0ffh
+MOV 02CH, #0ffh
+MOV 02DH, #0ffh
+MOV 02EH, #0ffh
+MOV 02FH, #0ffh
 ret
 
 Anzeigen:
@@ -53,9 +77,64 @@ MOV P2, #0ffh
 MOV P3, #07fh
 MOV P2, 027H
 MOV P2, #0ffh
+RET
 
 WirSindLebendig:
-ret
+MOV a,R1 ; wenn wir hier ankommen ist die aktuelle Zelle lebendig
+MOV b,#02h
+DIV ab
+CJNE a,#01h,keine2Lebendig ; macht das gleiche wie Abbruch
+MOV a,b
+CJNE a,#00h,keine2Lebendig ; mehr oder weniger als 2 Nachbarn
+RET
+
+Keine2Lebendig:
+MOV a,R1 ; wenn wir hier ankommen ist die aktuelle Zelle lebendig und hat nicht 2 Nachbarn
+MOV b,#03h
+DIV ab
+CJNE a,#01h,sterben ; macht das gleiche wie Abbruch
+MOV a,b
+CJNE a,#00h,sterben ; mehr oder weniger als 2 Nachbarn
+RET
+
+LadeNeueZeile:
+CJNE R6, #0h, Keine0NeueZeile
+MOV P3, 028H
+
+Keine0NeueZeile:
+CJNE R6, #1h, Keine1NeueZeile
+MOV P3, 029H
+Keine1NeueZeile:
+CJNE R6, #2h, Keine2NeueZeile
+MOV P3, 02AH
+Keine2NeueZeile:
+CJNE R6, #3h, Keine3NeueZeile
+MOV P3, 02BH
+Keine3NeueZeile:
+CJNE R6, #4h, Keine4NeueZeile
+MOV P3, 02CH
+Keine4NeueZeile:
+CJNE R6, #5h, Keine5NeueZeile
+MOV P3, 02DH
+Keine5NeueZeile:
+CJNE R6, #6h, Keine6NeueZeile
+MOV P3, 02EH
+Keine6NeueZeile:
+CJNE R6, #7h, Keine7NeueZeile
+MOV P3, 02FH
+Keine7NeueZeile:
+RET
+
+WirSindLebendigVerlaengerung:
+CALL WirSindLebendig
+RET
+
+sterben:
+CALL LadeNeueZeile
+CJNE R5,#00h,keine0Wiederbeleben
+CPL P3.0
+CALL SpeicherAktuelleZeile
+RET
 
 LebendeNachbarn:
 MOV R2,#00h ; init für count auf 0
@@ -94,45 +173,45 @@ MOV R1,a ; R1 == Anzahl lebender Nachbarn
 MOV R2,#00h
 INC R5
 CALL LebtNoch ; wenn R2 == 1 dann lebt aktuelle Zelle, sonst tot
-CJNE R2,#00h, WirSindLebendig
+CJNE R2,#00h, WirSindLebendigVerlaengerung
 MOV a,R1 ; wenn wir hier ankommen ist die aktuelle Zelle tot
 MOV b,#03h
 DIV ab
 CJNE a,#01h,keine7WiederBeleben ; macht das gleiche wie Abbruch
 MOV a,b
-CJNE a,#00h,keine7WiederBeleben ; wenn wir hier springen hat die Zelle mehr oder weniger 				als drei lebende Nachbarn
-CALL LadeAktuelleZeile
+CJNE a,#00h,keine7WiederBeleben ; wenn wir hier springen hat die Zelle mehr oder weniger als drei lebende Nachbarn
+CALL LadeNeueZeile
 CJNE R5,#00h,keine0Wiederbeleben
-CPL P3.7
+CPL P3.0
 CALL SpeicherAktuelleZeile
 
 keine0Wiederbeleben:
 CJNE R5,#01h, keine1Wiederbeleben
-CPL P3.6
+CPL P3.1
 CALL SpeicherAktuelleZeile
 keine1Wiederbeleben:
 CJNE R5,#02h, keine2Wiederbeleben
-CPL P3.5
+CPL P3.2
 CALL SpeicherAktuelleZeile
 keine2Wiederbeleben:
 CJNE R5,#03h, keine3Wiederbeleben
-CPL P3.4
+CPL P3.3
 CALL SpeicherAktuelleZeile
 keine3Wiederbeleben:
 CJNE R5,#04h, keine4Wiederbeleben
-CPL P3.3
+CPL P3.4
 CALL SpeicherAktuelleZeile
 keine4Wiederbeleben:
 CJNE R5,#05h, keine5Wiederbeleben
-CPL P3.2
+CPL P3.5
 CALL SpeicherAktuelleZeile
 keine5Wiederbeleben:
 CJNE R5,#06h, keine6Wiederbeleben
-CPL P3.1
+CPL P3.6
 CALL SpeicherAktuelleZeile
 keine6Wiederbeleben:
-CJNE R5,#02h, keine7Wiederbeleben
-CPL P3.0
+CJNE R5,#07h, keine7Wiederbeleben
+CPL P3.7
 CALL SpeicherAktuelleZeile
 keine7Wiederbeleben:
 ret
@@ -203,50 +282,50 @@ MOV b,#0ffh ; durch ff teilen weil R5=FF wenn negativ
 DIV ab
 CJNE a, #00h , Abbruch
 
-CJNE R6,#00h, Keine0
+CJNE R5,#00h, Keine0
 MOV c, P3.0
 CPL c
 JNC Abbruch
 INC R2
 
 Keine0:
-CJNE R6,#01h, Keine1
+CJNE R5,#01h, Keine1
 MOV c, P3.1
 CPL c
 JNC Abbruch
 INC R2
 Keine1:
-CJNE R6,#02h, Keine2
+CJNE R5,#02h, Keine2
 MOV c,P3.2
 CPL c
 JNC Abbruch
 INC R2
 Keine2:
-CJNE R6,#03h, Keine3
+CJNE R5,#03h, Keine3
 MOV c,P3.3
 CPL c
 JNC Abbruch
 INC R2
 Keine3:
-CJNE R6,#04h, Keine4
+CJNE R5,#04h, Keine4
 MOV c,P3.4
 CPL c
 JNC Abbruch
 INC R2
 Keine4:
-CJNE R6,#05h, Keine5
+CJNE R5,#05h, Keine5
 MOV c,P3.5
 CPL c
 JNC Abbruch
 INC R2
 Keine5:
-CJNE R6,#06h, Keine6
+CJNE R5,#06h, Keine6
 MOV c,P3.6
 CPL c
 JNC Abbruch
 INC R2
 Keine6:
-CJNE R6,#07h, Keine7
+CJNE R5,#07h, Keine7
 MOV c,P3.7
 CPL c
 JNC Abbruch
