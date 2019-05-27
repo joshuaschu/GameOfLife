@@ -5,23 +5,23 @@ Mastermind                                                                      
                          4     ORG 100H
                          5
                          6     Init:
-0100 7520FF              7     MOV 020H, #0ffh
-0103 7521F8              8     MOV 021H, #0f8h
-0106 7522FF              9     MOV 022H, #0ffh
+0100 7520FD              7     MOV 020H, #0fdh
+0103 7521FB              8     MOV 021H, #0fbh
+0106 7522F8              9     MOV 022H, #0f8h
 0109 7523FF             10     MOV 023H, #0ffh
 010C 7524FF             11     MOV 024H, #0ffh
 010F 7525FF             12     MOV 025H, #0ffh
 0112 7526FF             13     MOV 026H, #0ffh
 0115 7527FF             14     MOV 027H, #0ffh
                         15
-0118 7528FF             16     MOV 028H, #0ffh
-011B 7529F8             17     MOV 029H, #0f8h
-011E 752AFF             18     MOV 02AH, #0ffh
-0121 752BFF             19     MOV 02BH, #0ffh
-0124 752CFF             20     MOV 02CH, #0ffh
-0127 752DFF             21     MOV 02DH, #0ffh
-012A 752EFF             22     MOV 02EH, #0ffh
-012D 752FFF             23     MOV 02FH, #0ffh
+0118 852028             16     MOV 028H, 020H
+011B 852129             17     MOV 029H, 021H
+011E 85222A             18     MOV 02AH, 022H
+0121 85232B             19     MOV 02BH, 023H
+0124 85242C             20     MOV 02CH, 024H
+0127 85252D             21     MOV 02DH, 025H
+012A 85262E             22     MOV 02EH, 026H
+012D 85272F             23     MOV 02FH, 027H
                         24
 0130 020133             25     JMP Start
                         26
